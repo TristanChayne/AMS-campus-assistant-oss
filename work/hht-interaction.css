@@ -1,0 +1,12 @@
+/* HHT touch feedback uses the current theme, including dark appearance. */
+*{-webkit-tap-highlight-color:transparent}
+.page,body>main{padding-top:32px;padding-bottom:40px}
+button,a,summary{touch-action:manipulation}
+button,a.secondary,a.finish,header a,.jump a,summary{transition:transform 140ms ease,background-color 140ms ease,opacity 140ms ease;transform-origin:center}
+button:not(:disabled):active,a.secondary:active,a.finish:active,header a:active,.jump a:active{transform:scale(.975)}
+.primary:not(:disabled):active,.finish:active{opacity:.85}
+.icon-button:active,header a:active,.input-wrap button:active,.menu button:active{background:var(--wash,var(--accent-soft))}
+.secondary:active,.jump a:active,summary:active{background:var(--wash,var(--accent-soft))}
+summary{padding:8px 4px;margin:-8px -4px;border-radius:8px}
+button:disabled{opacity:.55;cursor:default}
+@media(prefers-reduced-motion:reduce){button,a,summary{transition:none!important;transform:none!important}}

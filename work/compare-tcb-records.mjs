@@ -1,0 +1,4 @@
+import fs from 'node:fs';import assert from 'node:assert/strict';
+const s=JSON.parse(fs.readFileSync('E:/DevTools/Cache/AmsActivationSecrets/secrets.json','utf8'));
+async function rows(base){const r=await fetch(base+'/api/admin/login',{method:'POST',headers:{Origin:base,'Content-Type':'application/json'},body:JSON.stringify({email:'2689232641@qq.com',password:s.ADMIN_PASSWORD})});assert.equal(r.status,200);const x=await fetch(base+'/api/admin/codes',{headers:{Cookie:r.headers.get('set-cookie').split(';')[0]}});return (await x.json()).codes;}
+const old=await rows('https://ams-campus-activation.ams-activation.workers.dev'),next=await rows('https://ams-activation-d7gv2f67vbfbacb39-1500641748.ap-shanghai.app.tcloudbase.com');for(const row of old)assert.deepEqual(next.find(x=>x.id===row.id),row);console.log('PASS: all original code records, device bindings and issue times match.');

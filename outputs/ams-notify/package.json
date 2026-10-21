@@ -1,0 +1,11 @@
+{
+  "name": "ams-notify",
+  "private": true,
+  "type": "module",
+  "description": "AMS service: course reminder pushes (REMIND-001), activation, device registry and admin API (ADMIN-BE-001)",
+  "engines": {"node": ">=24"},
+  "scripts": {
+    "start": "node src/main.mjs",
+    "test": "node --test test/schedule.test.mjs test/server.test.mjs test/host.test.mjs test/review-reminder.test.mjs"
+  }
+}

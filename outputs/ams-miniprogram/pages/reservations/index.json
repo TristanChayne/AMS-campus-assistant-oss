@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "campus-screen": "/components/campus-screen/index"
+  },
+  "enablePullDownRefresh": true
+}

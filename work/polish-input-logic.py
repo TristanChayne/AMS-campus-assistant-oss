@@ -1,0 +1,10 @@
+from pathlib import Path
+p=Path('work/build-live-ui.py');s=p.read_text(encoding='utf-8')
+s=s.replace('<div class="hero"><h2>输入课堂签到码</h2><p>核对后提交签到。</p></div>','')
+s=s.replace("if(data.route==='/leaveApplication'&&focused&&focused.id==='leaveReason')return;", "if(focused&&['INPUT','TEXTAREA','SELECT'].includes(focused.tagName)&&['/leaveApplication','/signCode'].includes(data.route)&&!data.submitting){focused.addEventListener('blur',()=>render(),{once:true});return;}")
+p.write_text(s,encoding='utf-8')
+p=Path('work/managed-leave-child.js');s=p.read_text(encoding='utf-8').replace("document.getElementById('leaveBack').onclick=()=>navigate('/leave','leave');","document.getElementById('leaveBack').onclick=()=>window.__amsHandleBack();")
+s=s.replace("if(route==='/leaveApplication'){show(","if(route==='/leaveApplication'&&page.form&&Object.values(page.form).some(v=>Array.isArray(v)?v.length:!!v)){show(")
+s=s.replace("if(route==='/leaveCourse'){send", "if(route==='/leaveApplication'){navigate('/leave','leave');return true;}if(route==='/leaveCourse'){send")
+p.write_text(s,encoding='utf-8')
+p=Path('work/check-leave-adapter.cjs');s=p.read_text(encoding='utf-8-sig').replace("sessionStorage:{", "localStorage:{getItem(){return null;}},sessionStorage:{");p.write_text(s,encoding='utf-8')

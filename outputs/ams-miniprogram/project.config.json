@@ -1,0 +1,14 @@
+{
+  "appid": "wxe5308ca806b9e927",
+  "projectname": "ams-campus-product",
+  "description": "AMS 原生小程序读取版 0.2.4",
+  "miniprogramRoot": "./",
+  "compileType": "miniprogram",
+  "setting": {
+    "urlCheck": true,
+    "es6": true,
+    "minified": true,
+    "minifyWXML": true,
+    "minifyWXSS": true
+  }
+}

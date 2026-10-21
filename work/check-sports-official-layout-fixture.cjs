@@ -1,0 +1,90 @@
+const fs=require('fs'),path=require('path'),crypto=require('crypto'),assert=require('assert'),{execFileSync,spawn}=require('child_process'),net=require('net'),{setTimeout:delay}=require('timers/promises'),{pathToFileURL}=require('url');
+const root=process.cwd(),out=process.argv[2]?path.resolve(process.argv[2]):path.join(root,'outputs/test-0.14.1-build73-stage3.3/official-layout-fixture');
+const edge='C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',baseline='android-v0.14.1-build73-stage-4';
+const oldCss=execFileSync('git',['show',`${baseline}:work/sports-theme.css`],{cwd:root,encoding:'utf8'});
+const oldUi=execFileSync('git',['show',`${baseline}:work/sports-ui.js`],{cwd:root,encoding:'utf8'});
+const chromeBaseline='android-v0.14.1-build73-stage-5',previousCss=execFileSync('git',['show',`${chromeBaseline}:work/sports-theme.css`],{cwd:root,encoding:'utf8'}),previousUi=execFileSync('git',['show',`${chromeBaseline}:work/sports-ui.js`],{cwd:root,encoding:'utf8'});
+const css=fs.readFileSync(path.join(root,'work/sports-theme.css'),'utf8'),ui=fs.readFileSync(path.join(root,'work/sports-ui.js'),'utf8');
+const screenDir=path.join(out,'screenshots'),fixtureDir=path.join(out,'fixtures');fs.mkdirSync(screenDir,{recursive:true});fs.mkdirSync(fixtureDir,{recursive:true});
+const officialCss=`
+*{box-sizing:border-box}html,body{margin:0;width:100%;font-family:Arial,"Noto Sans SC",sans-serif}
+.header{position:fixed;top:0;left:0;right:0;height:69px;z-index:1000;background:#fff;color:#17233a}.header.normal-flow-header{position:static}.court .header{position:static!important}.header .service-top{height:80px;overflow:visible}
+.service-top .service-top-inner{display:flex;width:100%}.service-top .service-top-inner.one-line{height:80px;overflow:hidden}
+.service-top.phone .one-line{height:40px!important;overflow:hidden!important}
+.service-top-box{display:flex;width:100%;height:80px;gap:0}.service-top-box .item{flex:0 0 88px;width:88px;height:40px;line-height:40px;text-align:center}
+.order-container{padding:0 10px}.order-tab-item{height:44px;line-height:44px}.order-box{min-height:80px;padding:14px;border:1px solid #ddd}
+.header-inner{display:flex;justify-content:space-between}.head-right{width:44px}.logo-zh{border-left:2px solid #123;margin-left:10px}.jiantou-box{cursor:pointer}.member-page{margin-top:70px}.member-bar{padding:24px;background:white}.member-bar .bar-item{padding:12px}.btn{min-height:44px;padding:10px 14px}.ticket-page{min-height:100px}.menus-fixed{position:absolute;right:0;top:64px;background:white;padding:20px;z-index:9999}
+`;
+const items=Array.from({length:16},(_,i)=>`<div class="item ${i===9?'checked':''}"><span class="service-name">项目${i+1}</span></div>`).join('');
+const court=`<div class="court"><div class="header"><div class="service-top phone"><div class="service-top-inner one-line"><div class="service-top-box">${items}</div></div></div></div></div>`;
+const compactHeader=`<div class="header"><div class="header-inner"><div class="head-left"><div class="logo"><div class="logo-en">XJTLU</div><div class="logo-zh"><span>Sports Centre(TC)</span><div class="jiantou-box" onclick="window.campusClicks=(window.campusClicks||0)+1">▾</div><div class="venues-box"></div></div></div></div><div class="head-right">⋮</div></div><div class="menus-fixed">个人中心　我的订单</div></div>`;
+const orders=`${compactHeader}<div class="main-body list-page"><div class="order-container"><div class="order-tab-item active">全部订单　待支付</div><div class="order-box">第一张演示订单卡片</div></div></div>`;
+const detail=`${compactHeader}<div class="main-body detail-page"><div class="order-container"><div class="order-container-operate"><button class="btn">退票</button></div><div class="order-box">合成订单详情（非真实订单）</div></div></div>`;
+const tickets=`${compactHeader}<div class="main-body member-page"><div class="el-row"><div class="el-col"><div class="member-bar"><div class="bar-item">个人中心</div><div class="bar-item">我的优惠券　我的课程　账户安全</div></div></div><div class="el-col"><div class="member-body"><div class="ticket-page">我的入馆票（合成空状态）</div></div></div></div></div>`;
+const report={result:'PASS',evidenceType:'Offline Edge rendering of a fixture using read-only observed official DOM selectors and CSS rules; not Android WebView or authenticated official-page acceptance',baselineRef:baseline,chromeBaselineRef:chromeBaseline,viewport:{width:390,height:844},checks:{},screenshots:[]};
+const sha=p=>crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex');
+const clean=s=>s.replace(/<\/script/gi,'<\\/script').replace(/<\/style/gi,'<\\/style');
+let edgeProcess,cdpSocket,cdpSession,cdpId=0;const pending=new Map();
+async function startEdge(){
+  const server=net.createServer();await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const port=server.address().port;await new Promise(resolve=>server.close(resolve));
+  const profile=path.join(fixtureDir,'edge-cdp-profile');fs.mkdirSync(profile,{recursive:true});
+  edgeProcess=spawn(edge,[`--user-data-dir=${profile}`,'--headless=new','--disable-gpu','--no-first-run','--no-default-browser-check',`--remote-debugging-port=${port}`,'--remote-allow-origins=*','about:blank'],{stdio:'ignore',windowsHide:true});
+  let version;for(let i=0;i<100;i++){try{version=await(await fetch(`http://127.0.0.1:${port}/json/version`)).json();break}catch{await delay(100)}}
+  assert(version?.webSocketDebuggerUrl,'Edge CDP endpoint did not start');cdpSocket=new WebSocket(version.webSocketDebuggerUrl);
+  await new Promise((resolve,reject)=>{cdpSocket.addEventListener('open',resolve,{once:true});cdpSocket.addEventListener('error',reject,{once:true})});
+  cdpSocket.addEventListener('message',event=>{const msg=JSON.parse(event.data);if(msg.id&&pending.has(msg.id)){const p=pending.get(msg.id);pending.delete(msg.id);msg.error?p.reject(new Error(msg.error.message)):p.resolve(msg.result)}else if(msg.method==='Page.loadEventFired'&&msg.sessionId===cdpSession){for(const cb of loadWaiters.splice(0))cb()}});
+  const create=await command('Target.createTarget',{url:'about:blank'});const attached=await command('Target.attachToTarget',{targetId:create.targetId,flatten:true});cdpSession=attached.sessionId;
+  await command('Page.enable');await command('Runtime.enable');await command('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});await command('Page.setLifecycleEventsEnabled',{enabled:true});
+}
+const loadWaiters=[];
+function command(method,params={}){const id=++cdpId;return new Promise((resolve,reject)=>{pending.set(id,{resolve,reject});const msg={id,method,params};if(cdpSession)msg.sessionId=cdpSession;cdpSocket.send(JSON.stringify(msg));setTimeout(()=>{if(pending.has(id)){pending.delete(id);reject(new Error(`CDP timeout: ${method}`))}},10000).unref()})}
+async function stopEdge(){try{cdpSocket?.close();edgeProcess?.kill()}catch{};cdpSocket=null;edgeProcess=null;cdpSession=null}
+function makePage(body,themeCss,script,measure,action=''){
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>${officialCss}</style><style>${clean(themeCss)}</style></head><body class="lang-zh_cn">${body}<script>${clean(script)}</script><pre id="fixture-result" style="display:none">pending</pre><script>setTimeout(()=>{${action}window.scrollTo(0,0);requestAnimationFrame(()=>{try{document.getElementById('fixture-result').textContent=JSON.stringify((${measure})())}catch(e){document.getElementById('fixture-result').textContent=JSON.stringify({error:String(e)})}})},300)</script></body></html>`;
+}
+async function runPageAsync(name,body,themeCss,script,measure,action='',width=390){
+  await command('Emulation.setDeviceMetricsOverride',{width,height:844,deviceScaleFactor:1,mobile:true});
+  const html=makePage(body,themeCss,script,measure,action),file=path.join(fixtureDir,`${name}.html`),screenshot=path.join(screenDir,`${name}.png`);fs.writeFileSync(file,html,'utf8');
+  const load=new Promise(resolve=>loadWaiters.push(resolve));await command('Page.navigate',{url:pathToFileURL(file).href});await load;await command('Runtime.evaluate',{expression:'history.scrollRestoration="manual";window.scrollTo(0,0)'});await delay(400);
+  let value;for(let i=0;i<30;i++){const response=await command('Runtime.evaluate',{expression:'document.getElementById("fixture-result")?.textContent',returnByValue:true});value=response.result?.value;if(value&&value!=='pending')break;await delay(100)}
+  assert(value&&value!=='pending',`${name}: fixture metrics did not settle`);const metrics=JSON.parse(value);assert(!metrics.error,`${name}: ${metrics.error}`);
+  assert.equal(metrics.viewport,width,`${name}: actual CSS viewport must match the requested width`);assert.equal(metrics.scrollY,0,`${name}: screenshot starts at the top of the page`);assert(metrics.documentWidth<=width&&metrics.bodyWidth<=width,`${name}: horizontal overflow (document ${metrics.documentWidth}, body ${metrics.bodyWidth})`);
+  await delay(100);const shot=await command('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});fs.writeFileSync(screenshot,Buffer.from(shot.data,'base64'));const relative=path.relative(out,screenshot).replace(/\\/g,'/');
+  const png=fs.readFileSync(screenshot);assert(png.length>1000&&png.readUInt32BE(16)===width&&png.readUInt32BE(20)===844,`${name}: screenshot dimensions must match the CSS viewport`);
+  report.screenshots.push({file:relative,sha256:sha(screenshot),bytes:png.length,width:png.readUInt32BE(16),height:png.readUInt32BE(20)});return metrics;
+}
+const projectMeasure=`()=>{const list=document.querySelector('.service-top-box'),inner=document.querySelector('.service-top-inner'),section=document.querySelector('.service-top'),header=document.querySelector('.header'),toggle=document.querySelector('#ams-project-toggle'),items=[...document.querySelectorAll('.service-top-box .item')],last=items[items.length-1],rect=e=>{const r=e.getBoundingClientRect();return{top:r.top,bottom:r.bottom,height:r.height,left:r.left,right:r.right}};const tr=toggle?.getBoundingClientRect(),hit=tr&&document.elementFromPoint((tr.left+tr.right)/2,(tr.top+tr.bottom)/2),displayed=items.filter(e=>getComputedStyle(e).display!=='none'&&getComputedStyle(e).visibility!=='hidden'&&Number(getComputedStyle(e).opacity)>0);return{viewport:innerWidth,documentWidth:document.documentElement.scrollWidth,bodyWidth:document.body.scrollWidth,scrollY,count:items.length,visibleCount:displayed.length,itemStates:items.map(e=>({name:e.textContent.trim(),display:getComputedStyle(e).display,visibility:getComputedStyle(e).visibility,opacity:getComputedStyle(e).opacity,color:getComputedStyle(e).color,textColor:getComputedStyle(e.querySelector('.service-name')).color,fontSize:getComputedStyle(e.querySelector('.service-name')).fontSize,rect:rect(e)})),selectedIndex:items.findIndex(e=>e.classList.contains('checked')),expanded:toggle?.getAttribute('aria-expanded'),toggleText:toggle?.textContent,toggleDisabled:toggle?.disabled,hidden:items.filter(e=>e.getAttribute('data-ams-project-collapsed')==='true').length,list:rect(list),inner:rect(inner),section:rect(section),header:rect(header),toggle:tr?{top:tr.top,bottom:tr.bottom,height:tr.height}:null,last:rect(last),columns:getComputedStyle(list).gridTemplateColumns,firstItemWidth:items[0]?.getBoundingClientRect().width,innerClientHeight:inner.clientHeight,innerScrollHeight:inner.scrollHeight,listClientHeight:list.clientHeight,listScrollHeight:list.scrollHeight,lastVisible:getComputedStyle(last).display!=='none'&&last.getBoundingClientRect().bottom<=inner.getBoundingClientRect().bottom+1,buttonHit:hit?.id||hit?.className||null,innerOverflow:getComputedStyle(inner).overflow}}`;
+const orderMeasure=`()=>{const h=document.querySelector('.header'),t=document.querySelector('.order-tab-item'),c=document.querySelector('.order-box'),b=document.querySelector('.main-body.list-page');return{viewport:innerWidth,documentWidth:document.documentElement.scrollWidth,bodyWidth:document.body.scrollWidth,scrollY,headerBottom:h.getBoundingClientRect().bottom,filterTop:t.getBoundingClientRect().top,filterBottom:t.getBoundingClientRect().bottom,cardTop:c.getBoundingClientRect().top,offset:b.style.getPropertyValue('--ams-order-header-offset'),bodyMargin:getComputedStyle(b).marginTop,bodyPadding:getComputedStyle(b).paddingTop,overlap:t.getBoundingClientRect().top<h.getBoundingClientRect().bottom}}`;
+async function main(){
+  await startEdge();
+  const beforeProject=await runPageAsync('before-project-expanded-clipped-390',court,oldCss,oldUi,projectMeasure);
+  assert.equal(beforeProject.selectedIndex,9);assert.equal(beforeProject.expanded,'true');assert.equal(beforeProject.toggleText,'Show fewer sports');
+  assert(beforeProject.innerClientHeight<beforeProject.innerScrollHeight,'old mobile !important rule clips the expanded grid');assert.equal(beforeProject.lastVisible,false);
+  report.checks.beforeProjectCrop=beforeProject;
+  const collapsedBody=court.replaceAll('class="item checked"','class="item"');
+  const collapsed=await runPageAsync('after-project-collapsed-390',collapsedBody,css,ui,projectMeasure);
+  assert.equal(collapsed.selectedIndex,-1);assert.equal(collapsed.toggleText,'展开全部 16 项');assert.equal(collapsed.hidden,8);assert.equal(collapsed.visibleCount,8);assert(collapsed.innerClientHeight>=collapsed.innerScrollHeight);
+  report.checks.collapsedProjects=collapsed;
+  const expanded=await runPageAsync('after-project-expanded-390',collapsedBody,css,ui,projectMeasure,`document.querySelector('#ams-project-toggle').click();`);
+  assert.equal(expanded.expanded,'true');assert.equal(expanded.hidden,0);assert.equal(expanded.visibleCount,16);assert.equal(expanded.toggleText,'收起项目');assert(expanded.list.height>=200);
+  assert(expanded.toggle.top>=expanded.list.bottom,'toggle is below the natural four-row grid');assert(expanded.innerClientHeight>=expanded.innerScrollHeight&&expanded.lastVisible);
+  assert.equal(expanded.buttonHit,'ams-project-toggle','toggle hit target is unobstructed');report.checks.expandedProjects=expanded;
+  const deep=await runPageAsync('after-deep-selection-remains-visible-390',court,css,ui,projectMeasure);
+  assert.equal(deep.expanded,'true');assert.equal(deep.toggleDisabled,true);assert.equal(deep.visibleCount,16);assert.equal(deep.toggleText,'所选项目需保持展开');assert(deep.lastVisible);report.checks.deepSelection=deep;
+  const beforeOrder=await runPageAsync('before-order-filter-covered-390',orders,oldCss,oldUi,orderMeasure);
+  assert.equal(beforeOrder.overlap,true);assert.equal(beforeOrder.filterTop,16);report.checks.beforeOrderHeaderOverlap=beforeOrder;
+  const afterOrder=await runPageAsync('after-order-filter-visible-390',orders,css,ui,orderMeasure);
+  assert.equal(afterOrder.offset,'0px');assert(afterOrder.headerBottom<=61);assert(afterOrder.filterTop>=afterOrder.headerBottom+8);assert(afterOrder.cardTop>=afterOrder.filterBottom);assert.equal(afterOrder.overlap,false);
+  report.checks.afterOrderHeaderOffset=afterOrder;
+  const chromeMeasure=`()=>{const header=document.querySelector('.header'),refund=document.querySelector('.order-container-operate .btn'),campus=document.querySelector('.logo-zh .jiantou-box'),r=refund?.getBoundingClientRect(),cr=campus.getBoundingClientRect(),hit=r&&document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return{viewport:innerWidth,documentWidth:document.documentElement.scrollWidth,bodyWidth:document.body.scrollWidth,scrollY,headerBottom:header.getBoundingClientRect().bottom,headerPosition:getComputedStyle(header).position,branding:getComputedStyle(document.querySelector('.logo-en')).display,menu:getComputedStyle(document.querySelector('.head-right')).display,overlay:getComputedStyle(document.querySelector('.menus-fixed')).display,refundTop:r?.top,refundHeight:r?.height,refundHit:hit===refund,campusHeight:cr.height,campusWidth:cr.width,campusClicks:window.campusClicks||0,ticketNavigationHeight:document.querySelector('.member-bar')?.getBoundingClientRect().height,ticketTop:document.querySelector('.ticket-page')?.getBoundingClientRect().top}}`;
+  const oldDetail=await runPageAsync('before-detail-refund-covered-390',detail,previousCss,previousUi,chromeMeasure);assert(oldDetail.refundTop<oldDetail.headerBottom);assert(!oldDetail.refundHit);report.checks.beforeRefund=oldDetail;
+  const newDetail=await runPageAsync('after-detail-refund-visible-390',detail,css,ui,chromeMeasure,`document.querySelector('.logo-zh .jiantou-box').click();`);assert(newDetail.refundTop>=newDetail.headerBottom);assert(newDetail.refundHit);assert(newDetail.refundHeight>=44);assert.equal(newDetail.branding,'none');assert.equal(newDetail.menu,'none');assert.equal(newDetail.overlay,'none');assert.equal(newDetail.campusClicks,1);assert(newDetail.campusHeight>=44&&newDetail.campusWidth>=44);report.checks.afterRefund=newDetail;
+  const oldTicket=await runPageAsync('before-ticket-personal-chrome-390',tickets,previousCss,previousUi,chromeMeasure);assert(oldTicket.ticketNavigationHeight>0);report.checks.beforeTicketChrome=oldTicket;
+  const newTicket=await runPageAsync('after-ticket-focused-content-390',tickets,css,ui,chromeMeasure);assert.equal(newTicket.ticketNavigationHeight,0);assert(newTicket.ticketTop>=newTicket.headerBottom&&newTicket.ticketTop<150);report.checks.afterTicketChrome=newTicket;
+  for(const width of [320,430]){
+    const m=await runPageAsync(`after-detail-refund-visible-${width}`,detail,css,ui,chromeMeasure,'',width);assert(m.refundTop>=m.headerBottom&&m.refundHit&&m.refundHeight>=44);assert.equal(m.branding,'none');assert.equal(m.menu,'none');report.checks[`refundAt${width}`]=m;
+  }
+  fs.writeFileSync(path.join(out,'layout-fixture-verification.json'),JSON.stringify(report,null,2)+'\n','utf8');
+  console.log(JSON.stringify({result:report.result,evidenceType:report.evidenceType,viewport:report.viewport,checks:Object.keys(report.checks),screenshots:report.screenshots.map(s=>s.file)},null,2));
+}
+main().then(stopEdge).catch(async error=>{await stopEdge();console.error(error.stack||error);process.exitCode=1});

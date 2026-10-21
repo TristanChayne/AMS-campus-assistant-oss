@@ -1,0 +1,53 @@
+const fs = require('fs'), vm = require('vm'), assert = require('assert/strict');
+const source = fs.readFileSync('outputs/ams-android/app/src/main/assets/library-seat-ui.js', 'utf8');
+const classes = initial => ({set:new Set(initial),contains(x){return this.set.has(x)},add(x){this.set.add(x)},remove(x){this.set.delete(x)},toggle(x,on){if(on)this.set.add(x);else this.set.delete(x)}});
+const make = () => ({style:{},children:[],classList:classes([]),value:'',isConnected:true,append(...x){this.children.push(...x)},appendChild(x){this.children.push(x)},replaceChildren(){this.children=[]},setAttribute(k,v){this[k]=v},get childElementCount(){return this.children.length},remove(){this.isConnected=false},scrollIntoView(){}});
+const calls=[],mapLabels=[];let tick;
+const canvas = make(); canvas.getContext=()=>({clearRect(){},drawImage(...args){calls.push(args)},beginPath(){},arc(x,y){calls.push({x,y})},fill(){},stroke(){},strokeText(){},fillText(label){mapLabels.push(label)}});
+const parts = Object.fromEntries(['input','.seat-list','.seat-detail','.seat-title','.seat-notice','.map-toggle','.filter-toggle','.seat-summary','.booking-toggle','.overview','.list-view','.overview-toggle','.list-toggle','.all-toggle','.view-feedback','.selection-feedback'].map(k=>[k,make()])); parts.canvas=canvas;canvas.setPointerCapture=()=>{};canvas.hasPointerCapture=()=>false;canvas.releasePointerCapture=()=>{};canvas.getBoundingClientRect=()=>({left:0,top:0,width:900,height:540});
+const panel=make();panel.querySelector=k=>parts[k];
+const image={src:'https://seatbookings.xjtlu.edu.cn/actual-map.jpg',complete:true,naturalWidth:1000,naturalHeight:600};
+const seats=[{title:'1F-024',className:'draggable green',classList:classes(['green']),style:{left:'75%',top:'50%'}},{title:'1F-025',className:'draggable yellow',classList:classes(['yellow']),style:{left:'10%',top:'10%'}},...['yellowGreen','gray','noopenlook','unknown'].map((state,i)=>({title:'1F-0'+(26+i),className:'draggable '+state,classList:classes([state]),style:{left:'10%',top:'10%'}})),{title:'hidden',className:'draggable green',classList:classes(['green']),style:{display:'none'}}];
+const bookingCalls=[];
+const area=make();area.__vue__={options:[{devName:'1F-024',isShow:true}],$parent:{handleClickItem(model){bookingCalls.push(model.devName)}}};area.querySelector=()=>image;area.querySelectorAll=()=>seats;area.before=()=>{};
+const ctx={getComputedStyle(){return {getPropertyValue(){return '#205c52'}}},location:{protocol:'https:',hostname:'seatbookings.xjtlu.edu.cn',hash:'#/ic/seatPredetermine/11'},window:{addEventListener(){}},document:{body:{classList:classes([])},head:{appendChild(){}},createElement(tag){return tag==='section'?panel:make()},querySelector:s=>(s.includes('navigation')||s==='.wrap'||s.startsWith('meta'))?null:area,querySelectorAll(){return []},getElementById(){return null}},setInterval(fn){tick=fn;return 1},clearInterval(){}};
+vm.runInNewContext(source,ctx);function tap(x,y){canvas.onpointerdown({pointerId:1,clientX:x,clientY:y});canvas.onpointerup({pointerId:1,clientX:x,clientY:y});}
+assert.equal(parts['.seat-list'].children.length,1);
+assert.equal(parts['.seat-list'].children[0].children[1].textContent,'空闲');
+parts['.all-toggle'].onclick();
+assert.equal(parts['.seat-list'].children.length,6);
+assert.deepEqual(parts['.seat-list'].children.map(x=>x.children[1].textContent),['空闲','已预约','部分空闲','不可预约','仅供查看','查看学校状态']);
+calls.length=0;parts['.seat-list'].children[0].onclick();
+assert(mapLabels.includes('024'));assert(!mapLabels.includes('1F-024'));assert.equal(seats[0].title,'1F-024');
+assert.equal(parts['.seat-title'].textContent,'1F-024 · 空闲');
+let draw=calls.find(Array.isArray);assert.equal(draw[0],image);assert.equal(draw[3],380);assert.equal(parts['.seat-detail'].hidden,false);
+calls.length=0;parts['.map-toggle'].onclick();draw=calls.find(Array.isArray);assert.equal(draw[1],0);assert.equal(draw[2],0);assert.equal(draw[3],1000);assert.equal(draw[4],600);
+const marker=calls.find(x=>!Array.isArray(x));assert.equal(marker.x,675);assert.equal(marker.y,270);
+parts.input.value='025';parts.input.oninput();assert.equal(parts['.seat-list'].children.length,1);
+assert.equal(area.classList.contains('campus-hide-map'),true);assert(!source.includes('original-toggle'));assert.equal((source.match(/<canvas /g)||[]).length,1);
+parts['.booking-toggle'].onclick();assert.deepEqual(bookingCalls,['1F-024']);parts['.booking-toggle'].onclick();assert.equal(bookingCalls.length,1);assert(parts['.selection-feedback'].textContent.includes('检查'));area.__vue__.$parent.$refs={seatForm:{dialogVisible:true}};tick();assert(parts['.selection-feedback'].textContent.includes('确认面板'));area.__vue__.$parent.$refs.seatForm.dialogVisible=false;
+parts['.overview-toggle'].onclick();assert.equal(parts['.overview'].hidden,false);assert.equal(parts['.list-view'].hidden,true);
+parts['.list-toggle'].onclick();assert.equal(parts['.list-view'].hidden,false);
+calls.length=0;parts['.seat-list'].children[0].onclick();assert.equal(parts['.booking-toggle'].disabled,true);parts['.booking-toggle'].onclick();assert.equal(bookingCalls.length,1);
+parts['.map-toggle'].onclick();calls.length=0;const requestsBeforeTap=bookingCalls.length;tap(675,270);assert.equal(bookingCalls.length,requestsBeforeTap);assert.equal(calls.filter(Array.isArray).at(-1)[3],380);assert.equal(parts['.seat-title'].textContent,'1F-024 · 空闲');assert.equal(parts['.booking-toggle'].disabled,false);
+parts['.booking-toggle'].onclick();assert.deepEqual(bookingCalls,['1F-024','1F-024']);
+area.__vue__.$parent.$refs.seatForm.dialogVisible=true;tick();area.__vue__.$parent.$refs.seatForm.dialogVisible=false;tap(675,270);area.__vue__=null;parts['.booking-toggle'].onclick();assert.equal(bookingCalls.length,2);assert(parts['.selection-feedback'].textContent.includes('重新加载'));
+// Zoom then drag: moving the map must not choose a seat, and crop stays inside the floor.
+calls.length=0;const before=parts['.seat-title'].textContent;
+canvas.onpointerdown({pointerId:3,clientX:450,clientY:270});canvas.onpointermove({pointerId:3,clientX:540,clientY:270});canvas.onpointerup({pointerId:3,clientX:540,clientY:270});assert.equal(parts['.seat-title'].textContent,before);
+let moved=calls.find(Array.isArray);assert(moved[1]>=0&&moved[1]+moved[3]<=1000);assert(moved[1]<560);
+seats.push({title:'1F-030',className:'draggable green',classList:classes(['green']),style:{left:'80%',top:'50%'}});
+const panX=moved[1];tap((800-moved[1])/moved[3]*900,(300-moved[2])/moved[4]*540);assert.equal(parts['.seat-title'].textContent,'1F-030 · 空闲');assert.equal(calls.filter(Array.isArray).at(-1)[1],panX);
+calls.length=0;canvas.onpointerdown({pointerId:4,clientX:450,clientY:270});canvas.onpointermove({pointerId:4,clientX:-10000,clientY:-10000});canvas.onpointercancel();moved=calls.find(Array.isArray);assert.equal(moved[1]+moved[3],1000);assert.equal(moved[2]+moved[4],600);
+const dialog=make();ctx.document.querySelectorAll=s=>s==='.seat-form .el-dialog'?[dialog]:[];tick();assert(dialog.classList.contains('campus-reservation-dialog'));
+area.__vue__={$parent:{dateValue:'2026-10-06',timeValue:['16:00','18:00']}};tick();area.__vue__.$parent.timeValue=['18:00','20:00'];tick();assert.equal(parts['.seat-detail'].hidden,true);assert(parts['.view-feedback'].textContent.includes('重新选座'));
+assert(!/fetch\(|XMLHttpRequest|\.click\(/.test(source));
+console.log('PASS: school state mapping, hidden seats, real map coordinates, list/map selection, confirmation handoff, unavailable seat guard and missing adapter; no live reservation request.');
+const ids={},navigation=make(),wrap=make();wrap.prepend=e=>{ids[e.id]=e};navigation.before=e=>{ids[e.id]=e};
+const landing={location:{protocol:'https:',hostname:'seatbookings.xjtlu.edu.cn',hash:'#/ic/home'},window:{addEventListener(){}},document:{head:{appendChild(){}},body:{classList:classes([])},createElement:make,querySelectorAll(){return []},getElementById:id=>ids[id]||null,querySelector:s=>s==='.wrap > .navigation'?navigation:s==='.wrap'?wrap:null},setInterval(){return 1},clearInterval(){}};
+vm.runInNewContext(source,landing);
+assert(ids['campus-seat-home']);assert(ids['campus-floor-toggle']);assert(landing.document.body.classList.contains('campus-seat-landing'));
+assert.equal(navigation.classList.contains('campus-folded'),false);
+console.log('PASS: school landing page takeover exposes campus/floor selection before seat-area exists.');
+
+

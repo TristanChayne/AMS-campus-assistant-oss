@@ -1,0 +1,25 @@
+/* Root chrome uses the original HTML in independently fixed views. */
+.app>header{display:none!important}
+nav{display:none!important}
+dialog::backdrop{-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+/* WebKit's SVG intrinsic grid sizing otherwise inflates the row to 114px. */
+.actions{grid-template-rows:min-content}
+.app:not(.focused-flow){padding:0 22px calc(24px + var(--system-bottom,0px))!important}
+.app.focused-flow{padding:16px 22px 28px!important}
+.app .return{display:none!important}
+.ios-settings-group{margin:8px 0 24px}
+.ios-settings-group>h2{font-size:14px;color:var(--pencil);margin:0 0 8px 4px;font-weight:600}
+.ios-settings-group .form-section{margin:0;padding:16px}
+.ios-settings-group .form-section>h2{font-size:15px}
+.ios-settings-group .settings-row{background:var(--paper);padding:12px 16px;font-size:16px}
+.ios-settings-group .about-app{text-align:left;padding:16px;margin:0;font-size:14px;line-height:1.8}
+.ios-account-section .logout-button{margin-top:16px;min-height:44px;width:100%;border-top:1px solid var(--line)}
+.reservation-service .ios-service-state{display:block;margin-top:6px;font-size:12px!important;color:var(--pencil)}
+#campus-room-panel .room-segment-list div{font-size:13px;line-height:1.7;padding:6px 8px}
+/* Empty days fill the viewport; all children remain in normal scroll flow. */
+.app.home-layout:not(.focused-flow){padding-bottom:calc(20px + var(--system-bottom,0px))!important}
+#homeScreen.ios-empty-day:not([hidden]){display:flex;flex-direction:column;min-height:calc(100dvh - var(--system-bottom,0px) - 20px)}
+#homeScreen.ios-empty-day>section[aria-label="课程列表"]{display:flex;flex-direction:column;flex:1}
+#homeScreen.ios-empty-day #lessons{display:flex;flex-direction:column;flex:1;min-height:220px}
+#homeScreen.ios-empty-day #lessons>.empty{margin:0;padding:28px 16px;flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center}
+#homeScreen.ios-empty-day #dailyLine{flex:none;margin:16px 0 0;padding-top:16px}

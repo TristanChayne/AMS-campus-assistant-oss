@@ -1,0 +1,1 @@
+page{background:#f5f6f8;color:#18233a;font-family:system-ui,-apple-system,sans-serif;font-size:28rpx;}button::after{border:none}button{font-size:28rpx;line-height:1.5;border-radius:24rpx;}

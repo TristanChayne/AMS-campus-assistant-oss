@@ -1,0 +1,140 @@
+{
+  "checkedDate": "2026-10-14",
+  "scope": "Independent opening 0-8 seconds, existing full film and three middle transitions unchanged",
+  "visual": {
+    "device": "iPhone 17 Pro Max",
+    "finish": "Cosmic Orange",
+    "material": "Aluminium unibody",
+    "ios": "26",
+    "widthMm": 78,
+    "heightMm": 163.4,
+    "depthMm": 8.75,
+    "screenPixels": [1320, 2868],
+    "background": "Pure black photographic studio",
+    "lighting": "Restrained warm highlights, natural glass reflection",
+    "specSource": "https://support.apple.com/zh-cn/125091"
+  },
+  "wallpaper": {
+    "name": "iPhone 17 Pro Cosmic Orange",
+    "page": "https://applewalls.com/en/wallpapers/iphone/iphone-17-pro-wallpapers",
+    "original": "https://static.applewalls.com/iPhone/iPhone%2017%20Pro/origin/iPhone%2017%20Pro%20Cosmic%20Orange.png",
+    "sha256": "9e7c03cec0c0c587ebfc89f96165ddf1a845db431b26b1abf80c85a05d0d2d94",
+    "bytes": 2031441,
+    "pixels": [1320, 2868],
+    "verified": "User file is byte-identical to the original PNG linked by the specified page, checked 2026-10-14",
+    "rights": "User explicitly selected this system wallpaper. The third-party archive offers a free download and is not affiliated with Apple; this is not a separately purchased stock licence. Wallpaper bytes remain local and are not redistributed in Git."
+  },
+  "reference": {
+    "sha256": "a017e7a5e5a2ed7d62b4a1dea0da9ab9907fab76901da8f213313f45f913f2ab",
+    "purpose": "User-supplied hand pose, composition and photography reference only",
+    "limitations": "Silver-looking frame, previous blue wallpaper and drawn UI are not evidence of the requested Cosmic Orange device or native iOS animation."
+  },
+  "candidates": [
+    {
+      "id": "jno-cosmic-orange",
+      "name": "Apple iPhone 17 Pro Max Cosmic Orange",
+      "author": "JNO_MODELS",
+      "url": "https://www.artstation.com/marketplace/p/yAj8n/apple-iphone-17-pro-max-cosmic-orange",
+      "listedUsd": 39,
+      "license": "Extended Commercial License",
+      "licenseSource": "https://www.artstation.com/marketplace-product-eula",
+      "formats": ["blend", "fbx", "obj", "max", "maya"],
+      "sellerClaims": "Post-announcement dimensions, named parts, UV mapped, 4K PBR texture maps",
+      "tested": false,
+      "cost": "Best documented quality candidate; convert and verify GLB, replaceable screen, dimensions and materials before use",
+      "status": "Not purchased or downloaded; account/region and checkout price not verified"
+    },
+    {
+      "id": "vendrakwan-cosmic-orange",
+      "name": "Iphone 17 Pro Max Cosmic Orange",
+      "author": "vendrakwan",
+      "url": "https://www.cgtrader.com/3d-models/electronics/phone/iphone-17-pro-max-cosmic-orange-b955d1be-501e-4a60-9b5f-31707e58f2fb",
+      "listedUsd": 10,
+      "license": "Royalty Free, exact downloaded product licence must be retained",
+      "licenseSource": "https://www.cgtrader.com/pages/terms-and-conditions",
+      "formats": ["blend", "fbx", "obj", "dae", "gltf"],
+      "sellerClaims": "Blender 4.5, preview rendered with Cycles; description mentions GLB",
+      "tested": false,
+      "cost": "Lower purchase cost; UV marked Unknown, dependencies and screen material require inspection",
+      "status": "Not purchased or downloaded"
+    },
+    {
+      "id": "free-cgtrader",
+      "name": "Iphone 17 Pro Max Free 3D model",
+      "author": "bhatowais786",
+      "url": "https://www.cgtrader.com/free-3d-models/electronics/phone/iphone-17-pro-max-f0b2fff3-c049-4853-bc80-e9d97eb835de",
+      "listedUsd": 0,
+      "license": "Royalty Free (no AI)",
+      "licenseSource": "https://www.cgtrader.com/pages/terms-and-conditions",
+      "formats": ["blend", "fbx"],
+      "sellerClaims": "Real scale, separated parts, editable metal/glass materials; platform FBX technical check",
+      "tested": true,
+      "cost": "No purchase cost; original Blender PBR can be retained, display atlas UV needs a separate projection",
+      "status": "User-authorized Chrome login/download completed. Blend/FBX locally inspected; minor dimension correction and screen split in a derived GLB. Commercial appearance and hand composition not accepted.",
+      "acquisition": {
+        "archiveBytes": 1384109,
+        "archiveSha256": "39664522efe45228775e772c7fb91b05ca8de12048110d65541338f94d8124b5",
+        "blendSha256": "9538eee7dce8de3f4789d10fe62e6e1e0f6ffd300d850c96dab0d9ccd32ae3e7",
+        "fbxSha256": "7ed68e030e2a7cbf4fd643ea27ca7d725b62825b4919fce4a4a5781996676c1e",
+        "rightsChecked": "Terms 21A/21B/24: incorporated commercial renders permitted; no model redistribution or machine-learning training. No separate licence text bundled in RAR.",
+        "originalBodyWidthHeightMm": [77.6,163],
+        "derivedBodyWidthHeightMm": [78,163.4],
+        "screen": "Display separated from Screen glass/tint; original atlas has zero UVs; derived continuous planar UV",
+        "materials": "Blend contains Principled PBR with Metal Body metallic .8886 / roughness .4364; FBX Phong conversion loses this information. No external textures."
+      }
+    },
+    {
+      "id": "ram-hand-psd",
+      "name": "Hand Holding iPhone 17 Pro Max Mockup",
+      "author": "Ram Studio",
+      "url": "https://www.mockupcloud.com/product/hand-holding-iphone-17-pro-max-mockup",
+      "listedUsd": 9,
+      "license": "Extended License",
+      "licenseSource": "https://www.mockupcloud.com/license",
+      "formats": ["psd"],
+      "sellerClaims": "5 PSD files, 4000x2667, Smart Object screen",
+      "tested": false,
+      "cost": "Low effort for fixed or slightly moving camera, hand and screen occlusion/reflective layers require PSD inspection",
+      "status": "Not purchased; Cosmic Orange frame and exact hand pose not confirmed"
+    },
+    {
+      "id": "sketchfab-free",
+      "name": "iPhone 17 Pro Max",
+      "author": "MajdyModels / MG990",
+      "url": "https://sketchfab.com/3d-models/iphone-17-pro-max-87fc1df741384124a8ce0226d2b2058d",
+      "listedUsd": 0,
+      "license": "CC Attribution in search index; confirm on download",
+      "licenseSource": "https://creativecommons.org/licenses/by/4.0/",
+      "formats": ["Platform glTF download, original format not confirmed"],
+      "sellerClaims": "29.6k triangles / 16.4k vertices in index",
+      "tested": false,
+      "cost": "Possible WebGL trial asset; account download, attribution and UV inspection required",
+      "status": "Page returned 403 during audit; download and current licence not confirmed"
+    }
+  ],
+  "nativeCapture": {
+    "screenRecording": "https://support.apple.com/en-us/102653",
+    "ios26SdrHdr": "https://support.apple.com/en-gb/guide/iphone/iph2d2500abc/26/ios/26",
+    "quicktime": "https://support.apple.com/en-au/guide/quicktime-player/qtp356b55534/10.5/mac/26",
+    "activityKit": "https://developer.apple.com/documentation/activitykit/displaying-live-data-with-live-activities",
+    "status": "Unlock footage supplied and audited; user identifies device as iPhone17ProMax. AMS Island footage pending; user requests other prerequisites and interchangeable crop/trim pipeline first.",
+    "unlock": {
+      "sha256": "4c9a66521766533c7f2f18a47717b058e1b45734a5e7cd5343251ac3eeb0421a",
+      "bytes": 4145682,
+      "pixels": [878,1900],
+      "durationSeconds": 2.976667,
+      "frames": 170,
+      "averageFrameRate": "51000/893",
+      "color": "HEVC Main10, BT.2020/PQ HDR",
+      "visual": "Lit lock screen to home screen, unlock around .85-1.55s; persistent blue screen-mirroring/computer indicators on the Island",
+      "limitations": "No screen-off/wake or AMS Island expansion. Not fixed native60fps. Exact iOS26.x version not supplied; original full-resolution history unverified."
+    },
+    "limits": "The built-in recording stop indicator can occupy the Dynamic Island. Apple does not guarantee 60 fps or complete lock/wake capture. Verify the actual target device output, prefer a wired QuickTime probe and SDR original."
+  },
+  "runtime": {
+    "officialPinnedTemplate": "https://github.com/remotion-dev/remotion/blob/v4.0.534/packages/template-three/package.json",
+    "integration": "https://www.remotion.dev/docs/three",
+    "videoTexture": "https://www.remotion.dev/docs/three/use-offthread-video-texture",
+    "status": "See compatibility output for actual isolated runtime result; capability calibration is not a phone product preview"
+  }
+}

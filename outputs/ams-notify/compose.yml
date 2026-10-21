@@ -1,0 +1,20 @@
+services:
+  ams-notify:
+    build: .
+    image: ams-notify:local
+    container_name: ams-notify
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:18640:8080"
+    env_file:
+      - /etc/ams-notify/ams-notify.env
+    environment:
+      AMS_NOTIFY_DB: /data/ams-notify.sqlite
+    volumes:
+      - ./data:/data
+      - /etc/ams-notify/keys:/run/keys:ro
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

@@ -1,0 +1,52 @@
+{
+  "pages": [
+    "pages/today/index",
+    "pages/records/index",
+    "pages/leave/index",
+    "pages/reservations/index",
+    "pages/login/index",
+    "pages/settings/index",
+    "pages/detail/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "AMS 校园助手",
+    "navigationBarBackgroundColor": "#f5f6f8",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f5f6f8"
+  },
+  "tabBar": {
+    "color": "#69758a",
+    "selectedColor": "#172e61",
+    "backgroundColor": "#f9fafc",
+    "list": [
+      {
+        "pagePath": "pages/today/index",
+        "text": "课表",
+        "iconPath": "assets/today.png",
+        "selectedIconPath": "assets/today-active.png"
+      },
+      {
+        "pagePath": "pages/records/index",
+        "text": "签到记录",
+        "iconPath": "assets/records.png",
+        "selectedIconPath": "assets/records-active.png"
+      },
+      {
+        "pagePath": "pages/leave/index",
+        "text": "请假",
+        "iconPath": "assets/leave.png",
+        "selectedIconPath": "assets/leave-active.png"
+      },
+      {
+        "pagePath": "pages/reservations/index",
+        "text": "预约",
+        "iconPath": "assets/reservations.png",
+        "selectedIconPath": "assets/reservations-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents",
+  "darkmode": true
+}

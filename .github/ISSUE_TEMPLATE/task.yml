@@ -1,0 +1,22 @@
+name: 开发任务
+description: 明确一个功能或修复的范围、负责人及验收
+body:
+  - type: textarea
+    id: outcome
+    attributes:
+      label: 问题与期望结果
+      description: 描述可观察的问题和完成后应有的行为；勿填写真实账号或凭证。
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: 范围与依赖
+      description: 涉及平台、源码/生成器入口、负责人和依赖；未知项可在调查后补齐。
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: 验收标准
+      description: 区分代码检查、构建、模拟器、真机与真实业务。
+    validations:
+      required: true

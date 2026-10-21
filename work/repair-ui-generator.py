@@ -1,0 +1,2 @@
+from pathlib import Path
+p=Path('work/build-live-ui.py');s=p.read_text(encoding='utf-8');a=s.index('installer = installer.replace(',s.index("setInterval(refresh,200)"));b=s.index("(root/'ams-modern-ui.js')",a);s=s[:a]+"installer = installer.replace(' let vueRoot=null;', Path('work/managed-leave-parent.js').read_text(encoding='utf-8')+'\\n let vueRoot=null;').replace('HTML',json.dumps(html,ensure_ascii=False))\n"+s[b:];p.write_text(s,encoding='utf-8')

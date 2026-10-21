@@ -1,0 +1,7 @@
+
+#campus-records-panel .record-filter,#campus-records-panel .record-dates,#campus-records-panel .record-dates label{min-width:0;max-width:100%}
+#campus-records-panel .record-dates{grid-template-columns:repeat(2,minmax(0,1fr))}
+#campus-records-panel .record-dates label{display:flex;flex-direction:column;gap:6px}
+#campus-records-panel input[type=date]{display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;min-inline-size:0;padding:10px 6px;font-size:16px}
+#campus-records-panel input[type=date]::-webkit-date-and-time-value{min-width:0;text-align:left}
+@media(max-width:420px){#campus-records-panel .record-dates{grid-template-columns:minmax(0,1fr)}}

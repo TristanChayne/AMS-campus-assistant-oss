@@ -1,0 +1,12 @@
+{
+  "slot": "native-system-screen",
+  "durationSeconds": 8,
+  "fps": 60,
+  "crop": {"x": 0, "y": 0, "width": 878, "height": 1900},
+  "trimIn": 0.05,
+  "trimOut": 2.9,
+  "placeAt": 1.5,
+  "target": {"width": 1320, "height": 2886, "fit": "contain", "padColor": "black", "purpose": "Model-specific PhoneDisplay UV fit; not the source-system resolution"},
+  "hdrToSdr": {"method": "hable", "referenceWhiteNits": 100, "toneMapPeak": 10, "desaturation": 0},
+  "note": "Play existing source frames at 1x, holding the first and last selected frames outside the clip. toneMapPeak is relative to referenceWhiteNits (10 means 1000 nits at a 100-nit reference). Capture indicators and existing UI remain in the supplied pixels."
+}

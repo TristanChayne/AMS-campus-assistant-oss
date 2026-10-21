@@ -1,0 +1,64 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>宿舍通行码</title>
+<style>
+:root{--accent:#172e61;--accent-soft:#eaf0fa;--bg:#f5f6f8;--surface:#fafbfd;--ink:#18233a;--muted:#69758a;--line:#e1e6ed;color-scheme:light}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;font-size:14px}body.dark{--bg:#131821;--surface:#1d2531;--ink:#e6edf7;--muted:#a0adc0;--line:#344052;color-scheme:dark}button,input,select{font:inherit}button{cursor:pointer;color:inherit}button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:3px}button{border:0;background:none}svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.page{padding:24px 22px 135px;max-width:430px;margin:auto}header{display:flex;align-items:center;justify-content:space-between;margin-bottom:30px;height:36px}header h1{font-size:18px;margin:0;font-weight:650}.icon-button{display:grid;place-items:center;width:40px;height:40px;border-radius:10px}a{color:var(--accent);text-decoration:none}.intro-icon{display:grid;place-items:center;width:58px;height:58px;background:var(--accent-soft);color:var(--accent);border-radius:17px;margin-bottom:20px}.intro-icon svg{width:30px;height:30px}h2{font-size:25px;margin:0 0 10px;letter-spacing:-.5px}.subtitle{color:var(--muted);line-height:1.8;margin:0 0 28px}.field-label{display:block;font-weight:600;margin-bottom:9px}.input-wrap{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}.input-wrap input{width:100%;min-width:0;padding:15px 13px;border:0;background:none;color:var(--ink);outline-offset:-3px}.input-wrap button{width:44px;flex-shrink:0;font-size:12px;color:var(--muted)}.field-hint{font-size:12px;color:var(--muted);line-height:1.7;margin:10px 0 22px}.primary{width:100%;padding:14px;border-radius:12px;background:var(--accent);color:white;font-weight:650;min-height:48px}.dark .primary{color:#101723}.secondary{width:100%;padding:13px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--accent);margin-top:12px}details{border-bottom:1px solid var(--line);padding:18px 0}summary{cursor:pointer;color:var(--muted);font-size:13px}details p,details ol{line-height:1.9;color:var(--muted);font-size:12px;padding-left:18px}.notice{margin-top:20px;color:var(--muted);font-size:12px;line-height:1.8}.feedback{min-height:24px;margin:9px 0;color:var(--accent);font-size:12px}.pass-user{text-align:center;margin:4px 0 25px}.brand{font-size:12px;color:var(--muted);margin-bottom:8px}.pass-user b{font-size:19px;font-weight:650}.pass-user small{display:block;color:var(--muted);font-size:12px;margin-top:9px}.qr-card{background:white;color:#18233a;border-radius:21px;padding:28px 22px 21px;border:1px solid var(--line);text-align:center;position:relative}.qr-placeholder{width:244px;max-width:100%;aspect-ratio:1;margin:auto;background:#f4f6f9;border:1px dashed #bdc8d9;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;border-radius:10px;color:#64738c}.qr-placeholder svg{width:72px;height:72px;stroke-width:1.2}.qr-placeholder b{font-size:14px}.qr-placeholder span{font-size:11px}.update{font-size:12px;color:#69758a;margin:20px 0 0}.status{margin:17px 0;text-align:center;color:var(--muted);font-size:12px}.error{color:#ae493f}.dark .error{color:#ffaaa0}.menu{padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);margin-bottom:20px;display:flex;gap:8px}.menu button{flex:1;min-height:40px;color:var(--accent)}[hidden]{display:none!important}.page{padding-bottom:32px}#qrImage{width:244px;max-width:100%;height:auto;display:block;margin:auto;image-rendering:pixelated}.notice{margin-bottom:24px}/* HHT touch feedback uses the current theme, including dark appearance. */
+*{-webkit-tap-highlight-color:transparent}
+.page,body>main{padding-top:32px;padding-bottom:40px}
+button,a,summary{touch-action:manipulation}
+button,a.secondary,a.finish,header a,.jump a,summary{transition:transform 140ms ease,background-color 140ms ease,opacity 140ms ease;transform-origin:center}
+button:not(:disabled):active,a.secondary:active,a.finish:active,header a:active,.jump a:active{transform:scale(.975)}
+.primary:not(:disabled):active,.finish:active{opacity:.85}
+.icon-button:active,header a:active,.input-wrap button:active,.menu button:active{background:var(--wash,var(--accent-soft))}
+.secondary:active,.jump a:active,summary:active{background:var(--wash,var(--accent-soft))}
+summary{padding:8px 4px;margin:-8px -4px;border-radius:8px}
+button:disabled{opacity:.55;cursor:default}
+@media(prefers-reduced-motion:reduce){button,a,summary{transition:none!important;transform:none!important}}
+</style>
+<main class="page"><header><button class="icon-button" id="back" aria-label="返回"><svg viewBox="0 0 24 24"><path d="m14 5-7 7 7 7"/></svg></button><h1 id="pageTitle">绑定慧湖通</h1><button class="icon-button" id="more" aria-label="绑定管理" hidden>•••</button><span id="headerSpace" style="width:40px"></span></header>
+<section id="binding"><div class="intro-icon"><svg viewBox="0 0 24 24"><path d="M3 9V3h6M15 3h6v6M21 15v6h-6M9 21H3v-6"/><path d="M7 7h3v3H7zM14 7h3v3h-3zM7 14h3v3H7zM14 14h3v3h-3z"/></svg></div><h2>绑定你的慧湖通</h2><p class="subtitle">完成绑定后，打开宿舍码即可查看<br>自己的通行二维码。</p><label class="field-label" for="credential" id="credentialLabel">OpenId</label><div class="input-wrap"><input id="credential" type="password" autocomplete="off" placeholder="粘贴你的 OpenId" aria-describedby="fieldHint"><button id="reveal" aria-label="显示凭证">显示</button></div><p class="field-hint" id="fieldHint">使用你自己的慧湖通身份信息。请勿分享给他人。</p><button class="primary" id="bind">验证并绑定</button><p class="feedback" id="feedback" role="status"></p><details><summary>如何获取 OpenId</summary><ol><li>在电脑上开启 Fiddler 的 HTTPS 抓包。</li><li>用电脑微信打开慧湖通，并登录自己的账号。</li><li>找到 api.215123.cn 下的 certificateLogin 请求，双击这一行后复制 openId 参数。</li><li>完成后停止抓包，将 OpenId 粘贴到这里。</li></ol><a id="tutorialLink" class="secondary" style="display:block;text-align:center" href="tutorial.html">查看详细教程 ›</a></details><details><summary>其他绑定方式</summary><p>也可以导入慧湖通登录令牌。令牌失效后，可能需要重新获取。</p><button class="secondary" id="switchMode">改用登录令牌</button></details><p class="notice">清除本机绑定不会解除学校系统中的账号绑定。<br>绑定信息仅在本机加密保存，不上传至 AMS 服务器。</p></section>
+<section id="pass" hidden><div class="menu" id="menu" hidden><button id="change">更换绑定</button><button id="unbind">清除本机绑定</button></div><div class="pass-user"><div class="brand">慧湖通</div><b id="passName">宿舍通行码</b><small>将二维码对准扫码设备</small></div><div class="qr-card"><img id="qrImage" alt="你的动态宿舍通行二维码" hidden><div class="qr-placeholder" id="qrPlaceholder"><svg viewBox="0 0 24 24"><path d="M3 9V3h6M15 3h6v6M21 15v6h-6M9 21H3v-6"/><path d="M7 7h3v3H7zM14 7h3v3h-3zM7 14h3v3H7zM14 14h3v3h-3z"/></svg><b id="qrTitle">正在获取二维码</b><span id="qrHint">请稍候</span></div><p class="update" id="updated">尚未获取二维码</p></div><p class="status" id="status" role="status">正在连接慧湖通</p><button class="primary" id="refresh">刷新二维码</button><button class="secondary" id="rebind" hidden>重新绑定</button></section></main>
+
+<script>const el=id=>document.getElementById(id);
+let mode='openid',bound=false,bindingBusy=false;
+function page(name){
+ const pass=name==='pass';el('binding').hidden=pass;el('pass').hidden=!pass;el('more').hidden=!pass;el('headerSpace').hidden=pass;
+ el('pageTitle').textContent=pass?'宿舍通行码':'绑定慧湖通';el('menu').hidden=true;window.scrollTo(0,0);
+}
+window.hhtHideCode=()=>{el('qrImage').hidden=true;el('qrImage').removeAttribute('src');el('qrPlaceholder').hidden=false;el('qrTitle').textContent='正在获取二维码';el('qrHint').textContent='请稍候';};
+window.hhtTheme=t=>{
+ document.body.classList.toggle('dark',t.dark);
+ for(const [name,value] of Object.entries({accent:t.accent,'accent-soft':t.wash,bg:t.bg,surface:t.surface,ink:t.ink,muted:t.muted,line:t.line}))document.body.style.setProperty('--'+name,value);
+};
+window.hhtResult=data=>{
+ if(data.kind==='session'){
+  bound=data.bound;bindingBusy=false;el('bind').disabled=false;el('bind').textContent='验证并绑定';page(bound?'pass':'binding');
+  el('credential').value='';el('feedback').textContent='';
+  if(!bound)window.hhtHideCode();
+ }else if(data.kind==='loading'){
+  window.hhtHideCode();el('refresh').disabled=true;el('refresh').textContent='正在刷新…';el('status').className='status';el('status').textContent='正在更新，请稍候';
+  if(data.binding){bindingBusy=true;el('bind').disabled=true;el('bind').textContent='正在验证…';el('feedback').textContent='正在验证慧湖通并获取通行码…';}
+ }else if(data.kind==='code'){
+  bound=true;bindingBusy=false;el('credential').value='';el('bind').disabled=false;el('bind').textContent='验证并绑定';el('feedback').textContent='';page('pass');
+  el('passName').textContent=data.name||'宿舍通行码';el('qrPlaceholder').hidden=true;el('qrImage').src='data:image/png;base64,'+data.image;el('qrImage').hidden=false;
+  el('updated').textContent='更新时间：'+new Date(data.updated).toLocaleTimeString();el('status').className='status';el('status').textContent='二维码每 8 秒自动更新';
+  el('refresh').hidden=false;el('refresh').disabled=false;el('refresh').textContent='刷新二维码';el('rebind').hidden=true;
+ }else if(data.kind==='error'){
+  window.hhtHideCode();el('qrTitle').textContent=data.expired?'登录凭证已失效':'二维码暂不可用';el('qrHint').textContent='';el('updated').textContent='当前没有可用二维码';
+  el('bind').disabled=false;el('bind').textContent='验证并绑定';el('refresh').disabled=false;el('refresh').textContent='重试获取二维码';el('refresh').hidden=false;
+  el('rebind').hidden=!data.expired;el('status').className='status error';el('status').textContent=data.message;el('feedback').textContent=data.message;bindingBusy=false;
+ }
+};
+el('back').onclick=()=>HhtBridge.close();
+el('more').onclick=()=>el('menu').hidden=!el('menu').hidden;
+el('reveal').onclick=()=>{const shown=el('credential').type==='password';el('credential').type=shown?'text':'password';el('reveal').textContent=shown?'隐藏':'显示';};
+el('bind').onclick=()=>{const value=el('credential').value.trim();if(!value){el('feedback').textContent='请先粘贴你的 '+(mode==='openid'?'OpenId':'satoken');return;}HhtBridge.bind(mode,value);};
+el('switchMode').onclick=()=>{
+ if(bindingBusy)return;mode=mode==='openid'?'token':'openid';el('credentialLabel').textContent=mode==='openid'?'OpenId':'登录令牌';
+ el('credential').placeholder=mode==='openid'?'粘贴你的 OpenId':'粘贴你的 satoken';el('credential').value='';el('feedback').textContent='';el('switchMode').textContent=mode==='openid'?'改用登录令牌':'改用 OpenId';
+};
+el('change').onclick=()=>{HhtBridge.edit();window.hhtHideCode();page('binding');};el('rebind').onclick=el('change').onclick;
+el('unbind').onclick=()=>HhtBridge.unbind();el('refresh').onclick=()=>HhtBridge.refresh();
+window.addEventListener('pagehide',window.hhtHideCode);
+HhtBridge.ready();
+</script></html>
+
+

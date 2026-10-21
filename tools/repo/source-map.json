@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "scope": "Critical entry points and known dependencies; not an exhaustive list of every generator input.",
+  "components": [
+    {
+      "id": "android",
+      "sources": ["outputs/ams-android/app/src/main/java", "outputs/ams-android/app/src/main/AndroidManifest.xml"],
+      "tools": ["outputs/ams-android/build-local.ps1", "outputs/ams-android/app/build.gradle"],
+      "generated": ["outputs/ams-android/app/src/main/assets/ams-modern-ui.js"],
+      "inputs": [],
+      "notes": "Native source is hand edited. Existing release build requires private signing and machine-specific paths; offline checks do not build an APK."
+    },
+    {
+      "id": "shared-web",
+      "sources": ["outputs/timetable-preview/index.html", "work/managed-ui-polish.css", "work/managed-timetable-cache.js", "work/managed-course-reminder-child.js", "work/managed-course-reminder-parent.js", "work/sports-ui.js", "work/sports-theme.css"],
+      "tools": ["work/build-live-ui.py"],
+      "generated": ["work/live-ui.html", "outputs/ams-android/app/src/main/assets/ams-modern-ui.js"],
+      "inputs": [],
+      "notes": "Run from repository root. This is shared generation ownership, including Android outputs and later iOS adaptation. Do not edit generated JS only."
+    },
+    {
+      "id": "reservation-web",
+      "sources": ["outputs/ams-android/app/src/main/assets/library-seat-ui.js", "outputs/ams-android/app/src/main/assets/library-room-ui.js", "outputs/ams-android/app/src/main/assets/reservation-records-ui.js", "outputs/ams-android/app/src/main/assets/reservation-reset-ui.js", "outputs/ams-android/app/src/main/assets/reservation-theme.css"],
+      "tools": ["work/check-library-seat-ui.cjs", "work/check-library-room-ui.cjs"],
+      "generated": [],
+      "inputs": [],
+      "notes": "These tracked Android assets are current hand-edited source, unlike ams-modern-ui.js. iOS adapts copies with prepare.py. Keep each origin explicit before extracting shared modules."
+    },
+    {
+      "id": "hht",
+      "sources": ["work/hht-pages-preview.html", "work/hht-tutorial-preview.html", "work/hht-mac-tutorial-content.html", "work/hht-product.js", "work/hht-interaction.css", "outputs/hht-entry-preview/assets"],
+      "tools": ["work/build-hht-product.py"],
+      "generated": ["outputs/ams-android/app/src/main/assets/hht", "outputs/ams-android/app/src/main/res/raw/hht_page.html"],
+      "inputs": [],
+      "notes": "The source assets directory is intentional despite its preview name. Independent PDF generation has separate external originals."
+    },
+    {
+      "id": "ios",
+      "sources": ["outputs/ams-ios/Sources", "work/ios"],
+      "tools": ["work/ios/prepare.py", "work/ios/sync-build.ps1"],
+      "generated": ["outputs/ams-ios/Assets", "outputs/ams-ios/AMS.xcodeproj"],
+      "inputs": [{"path": "outputs/ams-android/app/src/main/assets", "tracked": true}],
+      "notes": "Shared web assets currently transit Android. prepare.py --ios-only avoids rewriting backend review assets, but still regenerates iOS project/resources; inspect signing changes. Native compilation needs macOS/Xcode."
+    },
+    {
+      "id": "miniprogram",
+      "sources": ["work/build-miniprogram-product.py"],
+      "tools": ["work/check-miniprogram-product.cjs"],
+      "generated": ["outputs/ams-miniprogram"],
+      "inputs": [
+        {"path": "outputs/miniprogram-interface-probe/utils/ams-login.js", "tracked": false},
+        {"path": "outputs/miniprogram-interface-probe/utils/portal-sso.js", "tracked": false},
+        {"path": "outputs/miniprogram-interface-probe/utils/diagnostics.js", "tracked": false},
+        {"path": "outputs/miniprogram-interface-probe/pages/probe/index.js", "tracked": false}
+      ],
+      "notes": "Known reproducibility blocker: four historical source inputs are outside Git. Do not copy private probes wholesale or regenerate before a reviewed safe extraction. Existing generated app remains tracked."
+    },
+    {
+      "id": "service",
+      "sources": ["outputs/ams-notify/src", "outputs/ams-notify/test", "outputs/ams-activation-tencent/src", "outputs/ams-activation-tencent/schema.sql"],
+      "tools": ["outputs/ams-notify/Dockerfile", "work/deploy-ams-service.ps1"],
+      "generated": [],
+      "inputs": [],
+      "notes": "One current unified service. Deployment stages activation source/schema into the Docker context; a bare docker build from ams-notify is incomplete. deploy-ams-service.ps1 changes production and is never an onboarding/test command."
+    },
+    {
+      "id": "admin",
+      "sources": ["outputs/ams-admin/src", "outputs/ams-admin/test", "outputs/ams-admin/API-CONTRACT.md"],
+      "tools": ["outputs/ams-admin/package.json", "outputs/ams-admin/package-lock.json"],
+      "generated": [],
+      "inputs": [],
+      "notes": "Standalone React/Vite frontend. dist is local build output. Explicit preview=1 is isolated demonstration; ordinary entry restores a real admin session."
+    },
+    {
+      "id": "creative",
+      "sources": ["work/brand-film-v2", "work/phone-opening-proof"],
+      "tools": ["work/brand-film-v2/package.json", "work/phone-opening-proof/package.json"],
+      "generated": [],
+      "inputs": [],
+      "notes": "Independent promotional source. Videos, music, third-party models and original captures are local; source availability does not grant redistribution rights or prove media reproducibility."
+    }
+  ]
+}

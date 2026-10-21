@@ -1,0 +1,5 @@
+data
+test
+backups
+*.env
+*.p8

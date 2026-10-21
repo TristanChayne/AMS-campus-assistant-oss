@@ -1,0 +1,3 @@
+/* This page is hosted below the AMS UIKit navigation bar on iOS. */
+main>header{display:none!important}
+.page,body>main{padding-top:12px!important}

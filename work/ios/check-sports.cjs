@@ -1,0 +1,12 @@
+const fs=require('fs'),assert=require('assert/strict'),crypto=require('crypto');
+const app='outputs/ams-ios/';
+for(const name of ['sports-theme.css','sports-ui.js']) assert.equal(crypto.createHash('sha256').update(fs.readFileSync('work/'+name)).digest('hex'),crypto.createHash('sha256').update(fs.readFileSync(app+'Assets/'+name)).digest('hex'));
+assert(fs.readFileSync(app+'Assets/ios-preview-content.html','utf8').includes("['sports','体育馆预约'"));
+assert(!fs.readFileSync(app+'Assets/review-content.html','utf8').includes("['sports','体育馆预约'"));
+assert(fs.readFileSync(app+'Sources/CampusController.swift','utf8').includes('UINavigationController(rootViewController:SportsController())'));
+const source=fs.readFileSync(app+'Sources/SportsController.swift','utf8');
+assert(source.includes('let popup = makeWebView(configuration)'));
+assert(!source.includes('page.load(action.request)'));
+assert(!source.includes('KeychainStore')&&!source.includes('URLSession')&&!source.includes('localStorage'));
+assert(fs.readFileSync(app+'AMS.xcodeproj/project.pbxproj','utf8').includes('Sources/SportsController.swift'));
+console.log('PASS: sports entry/route, source asset parity, isolated review, Xcode inclusion and popup request preservation');

@@ -1,0 +1,60 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {fileURLToPath,pathToFileURL} from 'node:url';
+import {createHash} from 'node:crypto';
+import {execFileSync} from 'node:child_process';
+
+const here=path.dirname(fileURLToPath(import.meta.url)), root=path.resolve(here,'../..');
+const arg=(name, fallback)=>{const i=process.argv.indexOf(name);return i<0?fallback:process.argv[i+1];};
+const runtime=path.resolve(arg('--deps',path.join(root,'outputs/phone-opening-proof/runtime')));
+const out=path.resolve(arg('--output',path.join(root,'outputs/phone-opening-proof/opening')));
+const publicDir=path.join(out,'public');
+const hash=file=>createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+const model=arg('--model'), reviewPath=arg('--model-review'), screen=arg('--screen');
+if (!model||!reviewPath||!screen) throw Error('--model, --model-review and --screen are required.');
+const review=JSON.parse(fs.readFileSync(reviewPath));
+if (!review.commercialUseConfirmed||review.modelSha256!==hash(model)) throw Error('Reviewed model identity/licence required');
+fs.mkdirSync(publicDir,{recursive:true});
+fs.copyFileSync(model,path.join(publicDir,'model.glb'));
+fs.copyFileSync(screen,path.join(publicDir,'screen-60fps.mp4'));
+const {bundle}=await import(pathToFileURL(path.join(runtime,'node_modules/@remotion/bundler/dist/index.js')));
+const {selectComposition,renderMedia,renderStill}=await import(pathToFileURL(path.join(runtime,'node_modules/@remotion/renderer/dist/index.js')));
+const serveUrl=await bundle({entryPoint:path.join(here,'opening.jsx'),publicDir,webpackOverride:c=>({...c,resolve:{...c.resolve,modules:[path.join(runtime,'node_modules'),...(c.resolve?.modules||[])]}})});
+const options={serveUrl,id:'PhoneOpeningSwapProof',chromiumOptions:{gl:'angle'},browserExecutable:arg('--browser')};
+const composition=await selectComposition(options);
+const browserErrors=[], glInfo=[];
+const onBrowserLog=l=>{if(l.type==='error')browserErrors.push(l.text);if(l.text.startsWith('__OPENING_GL__'))glInfo.push(JSON.parse(l.text.slice('__OPENING_GL__'.length)));};
+const renderOptions={serveUrl,composition,chromiumOptions:options.chromiumOptions,browserExecutable:options.browserExecutable,onBrowserLog};
+const stillFrames=[0,144,216,479];
+if (process.argv.includes('--stills-only')) {
+  for(const frame of stillFrames) await renderStill({...renderOptions,frame,output:path.join(out,`frame-${frame}.png`)});
+  console.log(JSON.stringify({stills:stillFrames,browserErrors,glInfo}));
+  process.exit(browserErrors.length?1:0);
+}
+const video=path.join(out,'Phone-Opening-Swap-Proof-60fps.mp4');
+let last=-1;
+await renderMedia({...renderOptions,codec:'h264',crf:17,pixelFormat:'yuv420p',concurrency:1,outputLocation:video,onProgress:p=>{const step=Math.floor(p.renderedFrames/60);if(step!==last){last=step;console.log(`Opening frames ${p.renderedFrames}/480`);}}});
+for(const frame of stillFrames) await renderStill({...renderOptions,frame,output:path.join(out,`frame-${frame}.png`)});
+const probe=arg('--ffprobe'), ffmpeg=arg('--ffmpeg');
+if(!probe||!ffmpeg)throw Error('--ffprobe and --ffmpeg required for delivery checks');
+const metadata=JSON.parse(execFileSync(probe,['-v','error','-show_streams','-show_format','-of','json',video],{encoding:'utf8'}));
+const v=metadata.streams.find(s=>s.codec_type==='video');
+const pts=JSON.parse(execFileSync(probe,['-v','error','-select_streams','v:0','-show_entries','frame=best_effort_timestamp_time','-of','json',video],{encoding:'utf8'})).frames;
+if(v.width!==1080||v.height!==1920||v.avg_frame_rate!=='60/1'||pts.length!==480)throw Error('Opening output specification check failed');
+const maxPtsError=Math.max(...pts.map((f,i)=>Math.abs(Number(f.best_effort_timestamp_time)-i/60)));
+if(maxPtsError>1e-5||browserErrors.length)throw Error('Opening timing/browser checks failed');
+execFileSync(ffmpeg,['-v','error','-i',video,'-an','-f','null','-'],{stdio:'pipe'});
+const captionPixels=execFileSync(ffmpeg,['-v','error','-i',video,'-vf','crop=980:140:50:1730','-an','-pix_fmt','gray','-f','rawvideo','pipe:1'],{maxBuffer:80e6});
+const captionArea=980*140;
+const captionMeans=Array.from({length:480},(_,f)=>{let sum=0;for(let i=0;i<captionArea;i++)sum+=captionPixels[f*captionArea+i];return sum/captionArea;});
+if(captionPixels.length!==480*captionArea||Math.min(...captionMeans)<1)throw Error('Technical-proof caption disappeared on one or more frames');
+const report={purpose:'Independent eight-second phone/screen replacement proof; incomplete commercial opening',width:1080,height:1920,fps:60,frames:480,duration:8,fullDecodePassed:true,maxPtsErrorSeconds:maxPtsError,browserErrors,glInfo:glInfo[0],modelSha256:hash(model),screenSha256:hash(screen),videoSha256:hash(video),proofCaption:{frames:480,minimumMean:Math.min(...captionMeans),maximumMean:Math.max(...captionMeans),visibleOnEveryFrame:true},visualAcceptance:false,handAvailable:false,nativeIslandAvailable:false,unchanged:['Existing full film','Music timeline','Later scenes','Three middle transitions','Application source and packages']};
+if(arg('--music-from')) {
+  const musicSource=path.resolve(arg('--music-from'));
+  const musicVideo=path.join(out,'Phone-Opening-Swap-Proof-Music.mp4');
+  execFileSync(ffmpeg,['-y','-v','error','-i',video,'-i',musicSource,'-map','0:v:0','-map','1:a:0','-t','8','-c:v','copy','-c:a','aac','-b:a','192k','-ar','48000','-movflags','+faststart',musicVideo],{stdio:'pipe'});
+  execFileSync(ffmpeg,['-v','error','-i',musicVideo,'-f','null','-'],{stdio:'pipe'});
+  report.musicVersion={file:path.basename(musicVideo),sha256:hash(musicVideo),sourceSha256:hash(musicSource),sourceStartSeconds:0,scope:'First eight seconds of the existing full-film audio; existing full film and music timeline are unchanged'};
+}
+fs.writeFileSync(path.join(out,'opening-checks.json'),JSON.stringify(report,null,2));
+console.log(JSON.stringify(report,null,2));

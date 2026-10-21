@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="zh-CN" class="ams-offline-review"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; form-action 'none'; base-uri 'none'">
+<title>AMS 体育馆预约 · 离线评审版</title><style>@@BASE@@
+@@SPORTS_CSS@@</style></head>
+<body><div class="offline-label">离线评审版 · 全部数据为虚构演示 · 不连接学校或支付服务</div>
+<header class="native-header"><button data-action="back" aria-label="返回上一页">‹ 返回</button><strong id="page-title">体育馆预约</strong><button data-action="help">说明</button></header>
+<details class="review-tools"><summary>评审工具：主题、外观与异常状态</summary><div class="tool-fields"><label>主题<select id="palette"></select></label><label>外观<select id="appearance"><option value="light">浅色</option><option value="dark">暗色</option></select></label><label>预约页状态<select id="scenario"><option value="normal">有数据</option><option value="empty">无可售场地 / 票</option><option value="loading">加载中</option><option value="error">连接失败</option></select></label></div><div class="tool-buttons"><button data-action="login">演示登录 / 退出</button><button data-action="reset">恢复示例数据</button></div><p>本区域仅供评审，不属于 Android 正式界面。刷新页面会恢复初始数据。</p></details>
+<div id="screen"></div><nav class="native-tabs" aria-label="体育馆功能"><button data-route="court">场馆预约</button><button data-route="orders">我的订单</button><button data-route="tickets">我的票券</button></nav>
+<dialog id="modal" aria-labelledby="modal-title"><h2 id="modal-title"></h2><div id="modal-body"></div><button data-action="dismiss" class="dialog-close">关闭</button></dialog>
+<div id="toast" role="status" aria-live="polite"></div>
+<script type="application/json" id="demo-data">@@DATA@@</script><script>@@APP@@</script><script>@@SPORTS_UI@@</script></body></html>

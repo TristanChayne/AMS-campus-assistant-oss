@@ -1,0 +1,27 @@
+if(!window.webkit?.messageHandlers){const style=document.createElement('style');style.textContent='.app>header{display:flex!important}nav{display:flex!important}.app .return{display:block!important}';document.head.append(style);}
+window.addEventListener('message',e=>{if(e.source!==parent)return;if(e.data?.iosAction==='back'&&page.route?.startsWith('/review/')){e.stopImmediatePropagation();send(page.route==='/review/reminder'?'home':page.route.includes('leaveInfo')?'leave':'reservationService',{service:'home'});}if(e.data?.iosAction==='reviewScan'){send('reviewScan');}});
+function renderReviewScreen(screen){
+  const m=page.demo,s=m.state,route=page.route;
+ const notices='<p class="form-notice">'+escape(m.seed.notice)+'</p>';
+ const back='<button class="return review-back">‹ 返回</button>';
+ screen.innerHTML=back+notices;
+ if(route==='/review/reminder'){document.querySelector('h1').textContent='课程提醒演示';renderReviewReminderScreen(screen);}
+ else if(route==='/review/sports'){renderReviewSportsScreen(screen);}
+ else if(route==='/review/leaveInfo'){
+  document.querySelector('h1').textContent='申请详情';const row=s.leaves.find(r=>r.id===m.currentLeave);if(!row)return;
+  screen.innerHTML+=`<section class="form-section"><h2>${escape(row.leaveOdd)}</h2><p>${escape(row.startDate)} 至 ${escape(row.endDate)}</p><p>${escape(leaveTypeLabel(row.leaveType))} · ${row.cancelled?'已撤回':'待处理'}</p><p>${escape(row.leaveReason)}</p><h3>涉及课程</h3>${row.courseIds.map(id=>m.courses.find(c=>c.id===id)).map(c=>`<p>${escape(c.moduleCode)} · ${escape(c.moduleTime)}</p>`).join('')}<h3>证明附件</h3>${row.fileList.map(f=>`<p>${escape(f.originalFileName)} · 已保存到演示申请</p>`).join('')}<h3>处理记录</h3>${row.timeline.map(t=>`<p>${escape(t.time)}<br>${escape(t.text)}</p>`).join('')}${row.cancelled?'':'<button class="action" id="reviewCancelLeave">撤回演示申请</button>'}</section>`;
+  screen.querySelector('#reviewCancelLeave')?.addEventListener('click',()=>{if(confirm('撤回这份演示申请？'))send('cancelLeave',{id:row.id})});
+ }else if(route==='/review/records'){
+  document.querySelector('h1').textContent='我的预约';screen.innerHTML+=s.bookings.map(r=>`<section class="form-section"><h2>${escape(r.name)} ${r.direction?escape(r.direction):''}</h2><p>${escape(r.date)} ${escape(r.start)}${r.end?' — '+escape(r.end):''}</p><p>${r.cancelled?'已取消':'预约成功'} · ${r.people} 人</p>${r.cancelled?'':`<button class="action" data-ticket="${escape(r.id)}">查看${r.kind==='bus'?'乘车码':'预约码'}</button><button class="logout-button" data-cancel="${escape(r.id)}">取消预约</button>`}</section>`).join('')||'<p class="empty-state">暂无演示预约</p>';
+  screen.querySelectorAll('[data-ticket]').forEach(b=>b.onclick=()=>send('ticket',{payload:s.bookings.find(r=>r.id===b.dataset.ticket).ticket}));
+  screen.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=()=>{if(confirm('取消这笔演示预约？'))send('cancelBooking',{id:b.dataset.cancel})});
+ }else{
+  const kind=route.split('/').pop(),resources=m.seed.resources.filter(r=>r.kind===kind);document.querySelector('h1').textContent=kind==='bus'?'区间车':kind==='seat'?'图书馆座位':'讨论室';
+  screen.innerHTML+=`<form id="reviewBook" class="form-section"><label class="field">预约日期<input type="date" name="date" value="${escape(m.today)}" required></label>${kind==='bus'?`<label class="field">方向<select name="direction"><option value="TC-SIP">太仓 → 苏州工业园区</option><option value="SIP-TC">苏州工业园区 → 太仓</option></select></label><label class="field">班次<select name="start">${m.seed.busTimes.map(t=>`<option>${t}</option>`).join('')}</select></label><p class="form-help">演示班次按已采集时刻表生成；行程约 80 分钟。</p>`:`<label class="field">${kind==='seat'?'7F 座位':'3F 讨论室'}<select name="resourceId">${resources.map(r=>`<option value="${r.id}">${escape(r.name)}</option>`).join('')}</select></label>${kind==='seat'?'<div class="review-seat-map" aria-label="7F 座位选择"><div class="review-seat-plan">'+resources.map(r=>`<button type="button" class="review-seat" style="left:${Number(r.coordinate.split(',')[0])}%;top:${Number(r.coordinate.split(',')[1])}%" data-seat="${r.id}">${escape(r.name.replace('7F-',''))}</button>`) .join('')+'</div></div>':'<p class="form-help">314、316、318 · 2–5 人 · 开放时间 09:00–22:00</p>'}<div class="date-pair"><label class="field">开始<input type="time" name="start" value="10:00" required></label><label class="field">结束<input type="time" name="end" value="11:00" required></label></div><label class="field">人数<input type="number" name="people" value="${kind==='room'?2:1}" min="${kind==='room'?2:1}" max="${kind==='room'?5:1}"></label><div id="reviewOccupancy"></div>`}<button class="form-submit">确认演示预约</button></form>`;
+  const f=screen.querySelector('form');f.onsubmit=e=>{e.preventDefault();send('book',{kind,...Object.fromEntries(new FormData(f))});};
+  screen.querySelectorAll('[data-seat]').forEach(b=>b.onclick=()=>{f.elements.resourceId.value=b.dataset.seat;occupancy();});
+  function occupancy(){const id=f.elements.resourceId?.value,date=f.elements.date.value;screen.querySelectorAll('[data-seat]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.seat===id)));const el=document.getElementById('reviewOccupancy');if(!el)return;const rows=s.bookings.filter(r=>!r.cancelled&&r.resourceId===id&&r.date===date);el.innerHTML='<p class="form-help">'+(rows.length?'已预约：'+rows.map(r=>escape(r.start)+'–'+escape(r.end)).join('、'):'当前演示资源全天空闲')+'</p>';}
+  f.onchange=occupancy;occupancy();
+ }
+ screen.querySelector('.review-back').onclick=()=>send(route==='/review/reminder'?'home':route.includes('leaveInfo')?'leave':'reservationService',{service:'home'});
+}

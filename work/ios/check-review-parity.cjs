@@ -1,0 +1,22 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const sent=[],native=[],handlers={},pending=[];
+const frame={contentWindow:{postMessage(value){sent.push(value.amsUiData)}}};
+const model={seed:{student:'演示同学'},state:{anchor:'2026-10-12',attendance:[],leaves:[],bookings:[]},courses:[{id:'demo-course',dayOffset:0,moduleCode:'TEST',moduleTitle:'Test',date:'2026-10-12'}]};
+const window={addEventListener(name,fn){handlers[name]=fn},webkit:{messageHandlers:{amsReviewAction:{postMessage(value){native.push(value)}},amsReviewAPI:{postMessage(value){pending.push(value)}}}}};
+const context={window,document:{getElementById(id){return id==='ams-managed-ui'?frame:{hidden:true,onclick:null}}},location:{protocol:'file:',origin:'null'},crypto:require('node:crypto').webcrypto,Date,Map,FileReader:class{}};
+vm.createContext(context);vm.runInContext(fs.readFileSync('work/ios/review-bridge.js','utf8'),context);
+(async()=>{
+ const state=pending.shift();assert.equal(state.path,'state');window.__amsReviewResponse(state.id,200,model);await new Promise(setImmediate);
+ const action=value=>handlers.message({source:frame.contentWindow,data:{amsUiAction:value}});
+ await action('hhtCode');assert.equal(native.at(-1).action,'hht');
+ await action('scan');assert.equal(native.at(-1).action,'scan');
+ const sign=action('reviewScan');const request=pending.shift();assert.equal(request.path,'action');assert.equal(request.data.action,'sign');assert.equal(request.data.code,'123456');
+ window.__amsReviewResponse(request.id,200,{ok:true});await new Promise(setImmediate);
+ const reload=pending.shift();assert.equal(reload.path,'state');window.__amsReviewResponse(reload.id,200,model);await sign;
+ assert(sent.some(s=>s.route==='/signCodeSuccess'&&s.signInfo));
+ const nativeCode=fs.readFileSync('outputs/ams-ios/Sources/HhtController.swift','utf8');
+ assert(nativeCode.includes('if !reviewDemo,!designPreview'));assert(nativeCode.indexOf('if reviewDemo {')<nativeCode.indexOf('service.code(for:input)'));
+ assert(nativeCode.includes('reviewDemo || designPreview || (KeychainStore.save'));assert(nativeCode.includes('AMS-DEMO-NOT-VALID:HHT:'));
+ assert(!fs.readFileSync('outputs/ams-ios/Assets/ios-chrome.html','utf8').includes('.hht-code-button{display:none!important}'));
+ console.log('PASS: native demo HHT/scan routes, isolated sign and success state, review binding skips real service/keychain, visible HHT entry');
+})().catch(error=>{console.error(error);process.exitCode=1});

@@ -1,0 +1,43 @@
+/* Shared native palette; availability colours retain their meaning. */
+:root{--campus-paper:#f5f6f8;--campus-surface:#fcfdfe;--campus-input:#f5f7fa;--campus-ink:#17233a;--campus-muted:#69758a;--campus-line:#e2e8f0;--campus-primary:#172e61;--campus-accent:#254e9b;--campus-wash:#eaf0fa}
+html.campus-dark{color-scheme:dark}
+body:is(.campus-seat-managed,.campus-room-managed,.campus-records-managed){color:var(--campus-ink)!important;background:var(--campus-paper)!important}
+:is(.campus-seat-managed,.campus-room-managed,.campus-records-managed) :is(.el-menu,.el-submenu__title,.el-menu-item,.el-dialog,.el-message-box,.el-select-dropdown,.el-picker-panel,.el-date-picker,.el-pagination,.el-popper){background:var(--campus-surface)!important;color:var(--campus-ink)!important;border-color:var(--campus-line)!important}
+:is(.campus-seat-managed,.campus-room-managed,.campus-records-managed) :is(.el-submenu__title,.el-menu-item,.el-select-dropdown__item):hover{background:var(--campus-wash)!important}
+:is(.campus-seat-managed,.campus-room-managed,.campus-records-managed) :is(.el-menu-item.is-active,.el-select-dropdown__item.selected,.el-date-table td.current:not(.disabled) span){color:var(--campus-accent)!important}
+:is(.campus-seat-managed,.campus-room-managed,.campus-records-managed) :is(.el-input__inner,.el-textarea__inner,.el-button,.el-pager li,.el-pagination button,.el-checkbox__inner){background:var(--campus-input)!important;color:var(--campus-ink)!important;border-color:var(--campus-line)!important}
+:is(.campus-seat-managed,.campus-room-managed,.campus-records-managed) :is(.el-dialog__title,.el-message-box__title,.el-form-item__label,.el-checkbox__label,.el-radio__label,.el-message-box__content,.el-dialog__body,.el-picker-panel__icon-btn,.el-date-picker__header-label,.el-date-table th){color:var(--campus-ink)!important}
+:is(.campus-seat-managed,.campus-room-managed,.campus-records-managed) :is(.el-button--primary,.el-checkbox__input.is-checked .el-checkbox__inner,.el-radio__input.is-checked .el-radio__inner){background:var(--campus-primary)!important;color:#fff!important;border-color:var(--campus-primary)!important}
+:is(.campus-seat-managed,.campus-room-managed,.campus-records-managed) :is(.el-button:disabled,.el-input.is-disabled .el-input__inner,.el-date-table td.disabled div){background:var(--campus-input)!important;color:var(--campus-muted)!important}
+:is(.campus-seat-managed,.campus-room-managed,.campus-records-managed) :is(input,select,textarea){accent-color:var(--campus-accent);color:var(--campus-ink);background-color:var(--campus-input)}
+:is(.campus-seat-managed,.campus-room-managed,.campus-records-managed) :is(input,textarea)::placeholder{color:var(--campus-muted)}
+:is(.campus-seat-managed,.campus-room-managed,.campus-records-managed) :is(.el-message,.el-alert){background:var(--campus-surface);border-color:var(--campus-line)}
+:is(.campus-seat-managed,.campus-room-managed,.campus-records-managed) :is(.el-message__content,.el-alert__description){color:var(--campus-ink)}
+html.campus-dark #campus-seat-panel button[data-state="空闲"]{background:#213c32;border-color:#345b45;color:#a0d9bd}
+html.campus-dark #campus-room-panel .room-segment.free,html.campus-dark .room-segment-list .free{background:#213c32;color:#a0d9bd}
+html.campus-dark #campus-room-panel .room-segment.busy,html.campus-dark .room-segment-list .busy{background:#462e2a;color:#efb8a5}
+html.campus-dark #campus-seat-panel{box-shadow:none}
+:is(.campus-seat-managed,.campus-room-managed,.campus-records-managed) .el-date-table td.current:not(.disabled) span{background:var(--campus-primary)!important;color:#fff!important}
+:is(.campus-seat-managed,.campus-room-managed,.campus-records-managed) .el-date-table td.today span{color:var(--campus-accent)}
+:is(.campus-seat-managed,.campus-room-managed,.campus-records-managed) :is(.el-select-dropdown__item.is-disabled,.el-date-table td.disabled){color:var(--campus-muted)!important}
+.campus-reservation-dialog :is(.data-box,.research-title,.policy,.reservationPolicy,.el-form,p,td,th){color:var(--campus-ink)!important;border-color:var(--campus-line)!important}
+
+/* Official layout containers and late adapter styles must share the dark surface. */
+html.campus-dark :is(.campus-seat-managed,.campus-room-managed,.campus-records-managed) :is(.container,.wrap,.innerwrapp,.innerWrap,.navigation){background:var(--campus-paper)!important;border-color:var(--campus-line)!important;box-shadow:none!important}
+html.campus-dark :is(#campus-seat-panel,#campus-room-panel,#campus-room-welcome,#campus-room-floor,.seatOperation,.record-filter,.record-card,.room-time-card,.campus-reservation-dialog,.campus-reservation-dialog .el-dialog__header,.campus-reservation-dialog .el-dialog__body,.campus-reservation-dialog .el-dialog__footer){background-color:var(--campus-surface)!important;border-color:var(--campus-line)!important;box-shadow:none!important}
+html.campus-dark :is(#campus-seat-panel,#campus-room-panel,#campus-records-panel) :is(button,input,select,textarea){border-color:var(--campus-line)!important}
+html.campus-dark #campus-room-panel .room-segment{border-color:var(--campus-surface)!important}
+html.campus-dark #campus-room-panel .room-time-card.selected{background:var(--campus-wash)!important;border-color:var(--campus-accent)!important}
+html.campus-dark #campus-seat-panel button[data-state="空闲"]{border-color:#345b45!important}
+html.campus-dark .campus-reservation-dialog :is(.data-box,.data-box>div,.policy,.reservationPolicy,.el-form){background-color:var(--campus-surface)!important}
+html.campus-dark :is(.campus-seat-managed,.campus-room-managed,.campus-records-managed) .el-popper .popper__arrow{border-top-color:var(--campus-line)!important;border-bottom-color:var(--campus-line)!important}
+html.campus-dark :is(.campus-seat-managed,.campus-room-managed,.campus-records-managed) .el-popper .popper__arrow::after{border-top-color:var(--campus-surface)!important;border-bottom-color:var(--campus-surface)!important}
+
+#campus-records-panel .record-filter,#campus-records-panel .record-dates,#campus-records-panel .record-dates label{min-width:0;max-width:100%}
+#campus-records-panel .record-dates{grid-template-columns:repeat(2,minmax(0,1fr))}
+#campus-records-panel .record-dates label{display:flex;flex-direction:column;gap:6px}
+#campus-records-panel input[type=date]{display:block;width:100%;max-width:100%;min-width:0;box-sizing:border-box;min-inline-size:0;padding:10px 6px;font-size:16px}
+#campus-records-panel input[type=date]::-webkit-date-and-time-value{min-width:0;text-align:left}
+@media(max-width:420px){#campus-records-panel .record-dates{grid-template-columns:minmax(0,1fr)}}
+
+:is(#campus-seat-home,#campus-seat-panel,#campus-room-welcome,#campus-room-panel) h3{color:var(--campus-ink)!important}
